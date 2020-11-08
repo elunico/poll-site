@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poll Site</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <style>
+        body {
+            margin-left: 25vw;
+            margin-right: 25vw;
+        }
+
+        h1 {
+            font-size: 3rem;
+        }
+
+        h1,
+        h5 {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Create and Answer Polls <i>Fast!</i></h1>
+    <p>
+
+        <h5>Create a poll:</h5>
+
+        <input class="btn" type="button" value="Create" onclick="window.location.href = '/poll/new'">
+    </p>
+    <br>
+    <p>
+        <h5>Respond to a Poll:</h5>
+        <label hidden for="id">Poll ID</label>
+        <input type="text" name="id" id="poll-id" placeholder="Poll ID">
+        <input class="btn" type="button" name="go" id="poll-go" value="Answer">
+    </p>
+    <br>
+    <p>
+        <h5> View Poll Results:</h5>
+        <label hidden for="id">Poll ID</label>
+        <input type="text" name="id" id="poll-results-id" placeholder="Poll ID">
+        <input class="btn" type="button" name="go" id="poll-results-go" value="View">
+    </p>
+    <script>
+        let button = document.querySelector('#poll-go');
+        button.onclick = function () {
+            let input = document.querySelector('#poll-id');
+            let id = input.value;
+            window.location.href = `/poll/${id}`;
+        }
+
+        let viewButton = document.querySelector('#poll-results-go');
+        viewButton.onclick = function () {
+            let input = document.querySelector('#poll-results-id');
+            let id = input.value;
+            window.location.href = `/poll/results/${id}`;
+        }
+    </script>
+</body>
+
+</html>

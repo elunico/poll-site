@@ -1,0 +1,79 @@
+html 
+
+head 
+
+link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css")
+script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js")
+
+style. 
+    .results-table {
+        border: 1px solid black;
+        justify-content: right; 
+    }
+
+    td {
+        border: 1px solid black;
+        padding: 5px;
+    }
+
+    td.number {
+        border: 1px solid grey;
+        padding: 5px;
+        text-align: right;
+    }
+
+    h3 {
+        color: darkgray;
+    }
+
+    body {
+        margin-left: 25vw;
+        margin-right: 25vw;
+    }
+
+    h1 {
+        font-size: 3rem;
+    }
+
+    h1,
+    h5 {
+        font-weight: bold;
+    }
+
+
+body 
+
+h3 Poll #{pollID}
+
+h1(class="question") #{question}
+
+if free
+    h2 Responses: 
+    each response in responses
+        p= response.answer  
+else 
+
+    div(id="answers")
+        - var rs = {};
+        - var map = {};
+        each choice in responses
+            - rs[choice.choice] = 1 + (rs[choice.choice] || 0)
+            - map[choice.choice] = choice 
+        
+
+        table(class="results-table")
+            thead 
+                tr 
+                    td 
+                        b Answer Choice 
+                    td Number of Votes
+            tbody 
+                - for (let idx of Object.keys(rs)) 
+                    tr
+                    td
+                        //- b= `${Number(idx) + 1}. ${map[idx].answer}` 
+                        b= `${map[idx].answer}` 
+                    td(class='number')
+                        = rs[idx]
+    
+    

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a Poll</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <style>
+        body {
+            margin-left: 25vw;
+            margin-right: 25vw;
+        }
+
+        h1 {
+            font-size: 3rem;
+        }
+
+        h1,
+        h5 {
+            font-weight: bold;
+        }
+
+        #poll-id-area {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Create a Poll</h1>
+
+    <form name="poll-form" id="poll-form">
+        <label for="question">Question: </label>
+        <input type="text" name="question" id="question" placeholder="question">
+        <br>
+        <span id="qcontent">
+            <p>
+                <label for="free-response">
+                    <input class="with-gap" checked type="radio" name="qtype" id="free-response" value="free-response">
+                    <span>Free Response</span>
+                </label>
+            </p>
+            <p>
+                <label for="multiple">
+                    <input class="with-gap" type="radio" name="qtype" id="multiple" value="multiple">
+                    <span>Multiple Choice</span>
+                </label>
+            </p>
+            <div hidden id="response-area">
+                <div id="selection-area"></div>
+                <input class="btn" type="button" name="add-opt-btn" id="add-opt-btn" value="Add Choice">
+            </div>
+            <br>
+            <input class="btn" type="button" id="go-btn" name="go-btn" value="Create Poll">
+        </span>
+
+        <p id="poll-id-area"></p>
+    </form>
+    <script>
+        let questionInput = document.querySelector('#question');
+        let freeChoice = document.querySelector('#free-response');
+        let multipleChoice = document.querySelector('#multiple');
+        let qcontent = document.querySelector('#qcontent');
+
+        let responseArea = document.querySelector('#response-area');
+        let selectionArea = document.querySelector('#selection-area');
+        let addButton = document.querySelector('#add-opt-btn');
+        let goButton = document.querySelector('#go-btn');
+        let idArea = document.querySelector('#poll-id-area')
+
+        console.log(freeChoice.checked);
+
+        freeChoice.onclick = function () {
+            responseArea.setAttribute('hidden', 'true');
+        }
+
+        multipleChoice.onclick = function () {
+            responseArea.removeAttribute('hidden');
+        }
+
+        let optno = 0;
+        let options = {}
+
+        addButton.onclick = function () {
+            let option = document.createElement('input');
+            option.setAttribute('type', 'text');
+            let btn = document.createElement('input');
+            btn.setAttribute('type', 'button');
+            btn.setAttribute('class', 'btn')
+            btn.value = "Remove";
+            options[optno] = [option, btn];
+            let p = document.createElement('p');
+            btn.onclick = ((arg) => function () {
+                p.removeChild(option);
+                p.removeChild(btn);
+                selectionArea.removeChild(p);
+                delete options[arg];
+            })(optno)
+            p.appendChild(option);
+            p.appendChild(btn)
+            selectionArea.appendChild(p);
+            option.focus();
+            optno++;
+        }
+
+        goButton.onclick = function () {
+            let body;
+            if (freeChoice.checked) {
+                body = {
+                    question: questionInput.value,
+                    free: true,
+                    choices: []
+                }
+            } else {
+                body = {
+                    question: questionInput.value,
+                    free: false,
+                    choices: []
+                }
+
+                for (let option of Object.values(options)) {
+                    body.choices.push(option[0].value.trim());
+                }
+            }
+
+            let stringBody = JSON.stringify(body);
+
+            fetch('/poll/create', {
+                method: "POST",
+                body: stringBody,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': stringBody.length
+                }
+            }).then((resp) => {
+                return resp.json();
+            }).then((json) => {
+                console.log(json);
+                let pollID = json.pollID
+                qcontent.setAttribute('hidden', 'true');
+                idArea.innerHTML = `<a href="/poll/${pollID}">Your poll has ID ${pollID}</a>`
+            });
+        }
+    </script>
+</body>
+
+</html>

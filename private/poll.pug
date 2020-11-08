@@ -1,0 +1,127 @@
+html 
+
+head 
+link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css")
+script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js")
+style. 
+    h3 {
+        color: darkgray;
+    }
+
+    body {
+        margin-left: 25vw;
+        margin-right: 25vw;
+    }
+
+    h1 {
+        font-size: 3rem;
+    }
+
+    h1,
+    h5 {
+        font-weight: bold;
+    }
+
+    .success {
+        color: green;
+        font-size: 1.1em;
+    }
+
+    .failed {
+        color: red; 
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+body 
+
+h3 Poll #{pollID}
+
+h1(class="question") #{question}
+
+if free
+    textarea(id="response-area", class="tarea")
+    br
+    input(type="button", class="btn" id="submit-btn", value="Submit Answers")
+    
+    script. 
+        let area = document.querySelector('#response-area');
+        let button = document.querySelector('#submit-btn');
+
+        d.onclick = function() {
+            let body = {
+                pollID: #{pollID}, 
+                response: {answer: area.value, choice: null}
+            }
+        
+            let sbody = JSON.stringify(body);
+            fetch('/poll/submit', {
+                method: "POST", 
+                body: sbody,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': sbody.length
+                }
+            }).then(r => r.json()).then(j => {
+                if (j.success) {
+                    whole.innerHTML = '<div class="success">Submitted Successfully!</div>';
+                } else {
+                    whole.textContent = "<div class='failed'>Failed: " + JSON.stringify(j) + "</div>";
+                }
+            });
+        }
+    
+else 
+
+    span(id="whole")
+        div(id="answers")
+            each choice in choices 
+                div
+                    label(for=choice) 
+                        input(type="radio", class="with-gap", id=choice, value=choice, name="response") 
+                        span= choice 
+        br
+        p
+            input(type="button", class="btn" id="submit-btn", value="Submit Answers")
+
+    script. 
+        let button = document.querySelector('#submit-btn');
+        let answers = document.querySelector('#answers');
+
+        button.onclick = function() {
+            let body = {
+                pollID: #{pollID}
+            }
+            let idx = 0;
+            for (let elt of answers.children) { // divs
+                for (let other of elt.children) { // label 
+                for (let last of other.children) {  // inputs 
+                        if (last.checked) {
+                            body.response = { answer: last.value , choice: idx } 
+                        }
+                    }
+                }
+                idx++
+            }
+
+        
+            let sbody = JSON.stringify(body);
+            fetch('/poll/submit', {
+                method: "POST", 
+                body: sbody,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': sbody.length
+                }
+            }).then(r => r.json()).then(j => {
+                if (j.success) {
+                    whole.innerHTML = '<div class="success">Submitted Successfully!</div>';
+                } else {
+                    whole.textContent = "<div class='failed'>Failed: " + JSON.stringify(j) + "</div>";
+                }
+            });
+        }
+
+
+p View results 
+    a(href="/poll/results/" + pollID) by clicking here 
