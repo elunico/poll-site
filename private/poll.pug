@@ -86,7 +86,7 @@ if free
                 if (j.success) {
                     whole.innerHTML = '<div class="success">Submitted Successfully!</div>';
                 } else {
-                    whole.textContent = "<div class='failed'>Failed: " + JSON.stringify(j) + "</div>";
+                    whole.innerHTML = "<div class='failed'>Failed: " + j.reason + "</div>";
                 }
             });
         }
@@ -139,7 +139,7 @@ else if choices
                 if (j.success) {
                     whole.innerHTML = '<div class="success">Submitted Successfully!</div>';
                 } else {
-                    whole.textContent = "<div class='failed'>Failed: " + JSON.stringify(j) + "</div>";
+                    whole.innerHTML = "<div class='failed'>Failed: " + j.reason + "</div>";
                 }
             });
         }

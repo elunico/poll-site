@@ -15,14 +15,34 @@ const store = new db({
 const app = express();
 app.use(express.json());
 
-const environment = process.env.environment;
+const environment = process.env.NODE_ENVIRONMENT;
+let submitMiddleware;
 
 // slow mode for production use
 if (environment == 'production') {
-    app.use(rateLimit({
+    submitMiddleware = () => rateLimit({
         max: process.env.RATE_LIMIT_SUBMISSIONS || 1,
-        windowMs: process.env.RATE_LIMIT_WINDOW_MILLIS || (1000 * 60 * 1) // 1 minute 
-    }));
+        windowMs: process.env.RATE_LIMIT_WINDOW_MILLIS || (1000 * 60 * 1), // 1 minute 
+        message: {
+            success: false,
+            reason: 'Too many submission attempts!'
+        }
+    });
+} else {
+    submitMiddleware = function () {
+        return (req, res, next) => {
+            next();
+        };
+    }
+    app.get('/poll/all', (req, res) => {
+        db.find({}, (err, docs) => {
+            if (err) {
+                res.status(500).json(err);
+            } else {
+                res.json(docs);
+            }
+        })
+    });
 }
 
 app.get('/', (req, res) => {
@@ -92,7 +112,7 @@ app.get('/poll/:id', (req, res) => {
     });
 });
 
-app.post('/poll/submit', (req, res) => {
+app.post('/poll/submit', submitMiddleware(), (req, res) => {
     let pollID = req.body.pollID;
     let response = {
         ...req.body.response
