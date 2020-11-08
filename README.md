@@ -15,4 +15,4 @@ Polls never close
 
 Inspired by @shiffman and his attempts to make a live poll overlay 
 
-Uses: `express`, `express-rate-limit`, `nedb`, `pug` and `materializecss`
+Uses: `express`, `express-rate-limit`, `nedb`, `pug`, `dotenv`, and `materializecss`
