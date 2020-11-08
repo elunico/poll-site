@@ -40,17 +40,18 @@ h3 Poll #{pollID}
 h1(class="question") #{question}
 
 if free
-    textarea(id="response-area", class="tarea")
-    br
-    input(type="button", class="btn" id="submit-btn", value="Submit Answers")
+    span(id="whole")
+        textarea(id="response-area", class="tarea")
+        br
+        input(type="button", class="btn" id="submit-btn", value="Submit Answers")
     
     script. 
         let area = document.querySelector('#response-area');
         let button = document.querySelector('#submit-btn');
 
-        d.onclick = function() {
+        button.onclick = function() {
             let body = {
-                pollID: #{pollID}, 
+                pollID: "#{pollID}", 
                 response: {answer: area.value, choice: null}
             }
         
@@ -90,7 +91,7 @@ else
 
         button.onclick = function() {
             let body = {
-                pollID: #{pollID}
+                pollID: "#{pollID}"
             }
             let idx = 0;
             for (let elt of answers.children) { // divs

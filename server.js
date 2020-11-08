@@ -3,6 +3,7 @@ const rateLimit = require('express-rate-limit');
 const fs = require('fs');
 const path = require('path');
 const pug = require('pug');
+const crypto = require('crypto')
 
 const db = require('nedb');
 const store = new db({
@@ -31,9 +32,14 @@ app.get('/poll/new', (req, res) => {
     res.sendFile(path.join(__dirname, 'private', 'create.html'));
 })
 
+function randomLetters(count) {
+    return crypto.randomBytes(2 << (count + 1)).toString('base64').toLowerCase().replace(/\d+/g, '').replace(/[=\/]/g, '').substring(0, count)
+}
+
+
 app.post('/poll/create', (req, res) => {
     let created = Date.now();
-    let id = (created + Math.round(Math.random() * 100000000)) % (2 << 48);
+    let id = randomLetters(3) + '-' + Math.round(Math.random() * 1000) + '-' + randomLetters(3);
     store.insert({
         ...req.body,
         created: created,
@@ -62,7 +68,7 @@ const resultRenderer = pug.compileFile(path.join(__dirname, 'private', 'results.
 app.get('/poll/:id', (req, res) => {
     let id = req.params.id;
     store.findOne({
-        pollID: Number(id) || -1
+        pollID: id || -1
     }, (err, doc) => {
         if (err) {
             res.status(500).json({
@@ -85,7 +91,7 @@ app.post('/poll/submit', (req, res) => {
     }
 
     store.update({
-        pollID: Number(pollID)
+        pollID: pollID
     }, {
         $push: {
             responses: response
@@ -111,7 +117,7 @@ app.post('/poll/submit', (req, res) => {
 
 app.get('/poll/results/:id', (req, res) => {
     store.findOne({
-        pollID: Number(req.params.id)
+        pollID: req.params.id
     }, (err, doc) => {
         if (err) {
             res.status(500).json({
