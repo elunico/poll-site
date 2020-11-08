@@ -7,7 +7,7 @@ const crypto = require('crypto')
 
 const db = require('nedb');
 const store = new db({
-    filename: "database.txt",
+    filename: process.env.DATABASE_FILE || "database.txt",
     autoload: true
 });
 
@@ -77,8 +77,9 @@ app.get('/poll/:id', (req, res) => {
             })
         } else {
             res.send(pollRenderer({
+                pollID: id,
                 ...doc
-            }))
+            }));
         }
     });
 });
