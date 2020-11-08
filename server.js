@@ -5,6 +5,8 @@ const path = require('path');
 const pug = require('pug');
 const crypto = require('crypto')
 
+require('dotenv').config();
+
 const db = require('nedb');
 const store = new db({
     filename: process.env.DATABASE_FILE || "database.txt",
