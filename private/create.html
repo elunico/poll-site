@@ -36,6 +36,11 @@
             font-size: 1.2em;
             font-weight: bold;
         }
+
+        #key-area {
+            font-size: 1.1em;
+            color: red;
+        }
     </style>
 </head>
 
@@ -68,6 +73,8 @@
         </span>
 
         <p id="poll-id-area"></p>
+        <p id="key-button-area"></p>
+        <p id="key-area" hidden></p>
     </form>
     <script>
         let questionInput = document.querySelector('#question');
@@ -79,7 +86,10 @@
         let selectionArea = document.querySelector('#selection-area');
         let addButton = document.querySelector('#add-opt-btn');
         let goButton = document.querySelector('#go-btn');
-        let idArea = document.querySelector('#poll-id-area')
+        let idArea = document.querySelector('#poll-id-area');
+
+        let keyArea = document.querySelector('#key-area');
+        let keyButtonArea = document.querySelector('#key-button-area');
 
         console.log(freeChoice.checked);
 
@@ -138,7 +148,7 @@
 
             let stringBody = JSON.stringify(body);
 
-            fetch('/poll/create', {
+            fetch('/poll', {
                 method: "POST",
                 body: stringBody,
                 headers: {
@@ -152,7 +162,14 @@
                 let pollID = json.pollID
                 qcontent.setAttribute('hidden', 'true');
                 idArea.innerHTML = `<a href="/poll/${pollID}">Your poll has ID ${pollID}</a>`
+                keyButtonArea.innerHTML =
+                    `<input type="button" class="btn" onclick="keyArea.removeAttribute('hidden')" value="Show Master Key">`
+                keyArea.innerHTML = `Your poll's master key is ${json.master_key}`;
             });
+
+            function revealKey() {
+                keyArea.removeAttribute('hidden');
+            }
         }
     </script>
 </body>

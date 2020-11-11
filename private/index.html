@@ -56,6 +56,23 @@
         <input type="text" name="id" id="poll-results-id" placeholder="Poll ID">
         <input class="btn" type="button" name="go" id="poll-results-go" value="View">
     </p>
+    <br>
+    <p>
+        <h5> Lock/Unlock Poll:</h5>
+        <label hidden for="id">Poll ID</label>
+        <input type="text" name="id" id="poll-lock-id" placeholder="Poll ID">
+        <input type="text" name="key" id="poll-lock-key" placeholder="Poll Master Key">
+        <input class="btn" type="button" name="go" id="poll-lock-go" value="Lock">
+        <input class="btn" type="button" name="go" id="poll-unlock-go" value="Unlock">
+    </p>
+    <br>
+    <p>
+        <h5> Delete Poll:</h5>
+        <label hidden for="id">Poll ID</label>
+        <input type="text" name="id" id="poll-delete-id" placeholder="Poll ID">
+        <input type="text" name="key" id="poll-delete-key" placeholder="Poll Master Key">
+        <input class="btn" type="button" name="go" id="poll-delete-go" value="Delete">
+    </p>
     <script>
         let button = document.querySelector('#poll-go');
         button.onclick = function () {
@@ -69,6 +86,78 @@
             let input = document.querySelector('#poll-results-id');
             let id = input.value;
             window.location.href = `/poll/results/${id}`;
+        }
+
+        let lockButton = document.querySelector('#poll-lock-go');
+        lockButton.onclick = function () {
+            let id = document.querySelector('#poll-lock-id').value;
+            let key = document.querySelector('#poll-lock-key').value;
+
+            let body = {
+                id: id,
+                master_key: key
+            };
+            let sbody = JSON.stringify(body);
+
+            fetch(`/poll/lock/${id}`, {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': sbody.length
+                },
+                body: sbody
+            }).then(resp => resp.json()).then(data => {
+                console.log(data);
+            });
+        }
+
+        let unlockButton = document.querySelector('#poll-unlock-go');
+        unlockButton.onclick = function () {
+            let id = document.querySelector('#poll-lock-id').value;
+            let key = document.querySelector('#poll-lock-key').value;
+
+            let body = {
+                id: id,
+                master_key: key
+            };
+            let sbody = JSON.stringify(body);
+
+            fetch(`/poll/unlock/${id}`, {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': sbody.length
+                },
+                body: sbody
+            }).then(resp => resp.json()).then(data => {
+                console.log(data);
+            });
+        }
+
+        let deleteButton = document.querySelector('#poll-delete-go');
+        deleteButton.onclick = function () {
+            let id = document.querySelector('#poll-delete-id').value;
+            let key = document.querySelector('#poll-delete-key').value;
+
+            let body = {
+                id: id,
+                master_key: key
+            };
+            let sbody = JSON.stringify(body);
+
+            fetch(`/poll/${id}`, {
+                method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': sbody.length
+                },
+                body: sbody
+            }).then(resp => {
+                console.log(resp);
+                return resp.json()
+            }).then(data => {
+                console.log(data);
+            });
         }
     </script>
 </body>
