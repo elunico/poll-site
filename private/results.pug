@@ -7,6 +7,13 @@ script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/material
 
 style. 
 
+    .placeholder-text {
+        font-size: 1.1em;
+        color: grey;
+        font-style: italic; 
+        margin-left: 1%;
+    }
+
     a:link {
             color: rgb(81, 153, 164);
     }
@@ -38,6 +45,7 @@ style.
     body {
         margin-left: 25vw;
         margin-right: 25vw;
+        margin-bottom: 5vw;
     }
 
     h1 {
@@ -74,24 +82,27 @@ else
     div(id="answers")
         - var rs = {};
         - var map = {};
-        each choice in responses
-            - rs[choice.choice] = 1 + (rs[choice.choice] || 0)
-            - map[choice.choice] = choice 
-        
+        if responses
+            each choice in responses
+                - rs[choice.choice] = 1 + (rs[choice.choice] || 0)
+                - map[choice.choice] = choice 
+            
 
-        table(class="results-table")
-            thead 
-                tr 
-                    td 
-                        b Answer Choice 
-                    td Number of Votes
-            tbody 
-                - for (let idx of Object.keys(rs)) 
-                    tr
-                    td
-                        //- b= `${Number(idx) + 1}. ${map[idx].answer}` 
-                        b= `${map[idx].answer}` 
-                    td(class='number')
-                        = rs[idx]
+            table(class="results-table")
+                thead 
+                    tr 
+                        td 
+                            b Answer Choice 
+                        td Number of Votes
+                tbody 
+                    - for (let idx of Object.keys(rs)) 
+                        tr
+                        td
+                            //- b= `${Number(idx) + 1}. ${map[idx].answer}` 
+                            b= `${map[idx].answer}` 
+                        td(class='number')
+                            = rs[idx]
+        else 
+            p(class='placeholder-text') No Responses have been submitted.
     
     
