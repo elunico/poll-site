@@ -9,9 +9,13 @@ Anyone can submit a vote or a response
 You can limit how many times a specific IP is allowed to submit using the `.env` file (implemented with `express-rate-limit`).
 *Note that this is disabled unless `process.env.NODE_ENVIRONMENT=='production'`
 
-Results of all polls are viewable by everyone
+Results of all polls are viewable by everyone 
 
-Polls never close 
+When created, polls are given a public ID that is used to both submit and view responses. They 
+also receive a "master key" which is a private identifier that the creator (or anyone who gets
+their hands on it) can use to lock, unlock, and delete the poll. Locked polls do not accept 
+new submissions and unlocked ones do. Polls are unlocked by default on creation. Deleted polls 
+cannot be seen and their responses are destroyed.
 
 Inspired by @shiffman and his attempts to make a live poll overlay 
 
