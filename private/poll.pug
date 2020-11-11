@@ -20,6 +20,7 @@ style.
     body {
         margin-left: 25vw;
         margin-right: 25vw;
+        margin-bottom: 5vw;
     }
 
     h1 {
@@ -75,8 +76,8 @@ if free
             }
         
             let sbody = JSON.stringify(body);
-            fetch('/poll/submit', {
-                method: "POST", 
+            fetch('/poll', {
+                method: "PUT", 
                 body: sbody,
                 headers: {
                     'Content-Type': 'application/json',
