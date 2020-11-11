@@ -2,7 +2,8 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const pug = require('pug');
-const crypto = require('crypto')
+const crypto = require('crypto');
+const api = require('./api.js');
 
 require('dotenv').config();
 
@@ -45,20 +46,29 @@ if (environment == 'production') {
     });
 }
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'private', 'index.html'));
-});
+const STATIC_DIR = 'private';
 
-app.get('/poll/new', (req, res) => {
-    res.sendFile(path.join(__dirname, 'private', 'create.html'));
-})
+function serveStatic(filepath) {
+    if (typeof filepath === 'string') {
+        filepath = [filepath]
+    }
+    return (req, res) => {
+        res.sendFile(path.join(__dirname, STATIC_DIR, ...filepath));
+    }
+}
+
+app.get('/', serveStatic('index.html'));
+
+app.use('/api', api(store));
+
+app.get('/poll/new', serveStatic('create.html'))
 
 function randomLetters(count) {
     return crypto.randomBytes(2 << (count + 1))
         .toString('base64')
         .toLowerCase()
         .replace(/\d+/g, '')
-        .replace(/[=+\/]/g, '')
+        .replace(/\W+/g, '')
         .substring(0, count);
 }
 
