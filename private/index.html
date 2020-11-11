@@ -36,6 +36,21 @@
 </head>
 
 <body>
+
+    <!-- Modal Trigger -->
+    <!-- <a class="waves-effect waves-light btn modal-trigger" href="#status-modal">Modal</a> -->
+
+    <!-- Modal Structure -->
+    <div id="status-modal" class="modal">
+        <div class="modal-content">
+            <h4 id="modal-title">Success</h4>
+            <p id="modal-msg">A bunch of text</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Ok</a>
+        </div>
+    </div>
+
     <h1>Create and Answer Polls <i>Fast!</i></h1>
     <p>
 
@@ -106,6 +121,15 @@
             }
         }
 
+        function showModal(title, message) {
+            let elt = document.querySelector('#status-modal');
+            let msg = document.querySelector('#modal-msg');
+            let mt = document.querySelector('#modal-title');
+            msg.textContent = message;
+            mt.textContent = title
+            M.Modal.init(elt, {}).open();
+        }
+
 
         let button = document.querySelector('#poll-go');
         button.onclick = function () {
@@ -140,7 +164,13 @@
                 },
                 body: sbody
             }).then(resp => resp.json()).then(data => {
-                console.log(data);
+                if (data.success) {
+                    showModal('Successfully locked poll', data.reason);
+                } else {
+                    showModal('Failed to lock poll', data.reason);
+                }
+            }).catch(reason => {
+                showModal('Failed to lock poll', data.reason);
             });
         }
 
@@ -163,7 +193,13 @@
                 },
                 body: sbody
             }).then(resp => resp.json()).then(data => {
-                console.log(data);
+                if (data.success) {
+                    showModal('Successfully unlocked poll', data.reason);
+                } else {
+                    showModal('Failed to unlock poll', data.reason);
+                }
+            }).catch(reason => {
+                showModal('Failed to unlock poll', data.reason);
             });
         }
 
@@ -186,11 +222,16 @@
                 },
                 body: sbody
             }).then(resp => {
-                console.log(resp);
                 return resp.json()
             }).then(data => {
-                console.log(data);
-            });
+                if (data.success) {
+                    showModal('Successfully Deleted', data.reason);
+                } else {
+                    showModal('Failed to delete', data.reason);
+                }
+            }).catch(reason => {
+                showModal('Failed to delete', reason);
+            })
         }
     </script>
 </body>

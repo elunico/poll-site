@@ -108,11 +108,9 @@ const resultRenderer = pug.compileFile(path.join(__dirname, 'private', 'results.
 
 app.get('/poll/:id', (req, res) => {
     let id = req.params.id;
-    console.log(id);
     store.findOne({
         pollID: id || -1
     }, (err, doc) => {
-        console.log(doc);
         if (err) {
             res.status(500).json({
                 success: false,
