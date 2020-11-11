@@ -21,6 +21,7 @@
         body {
             margin-left: 25vw;
             margin-right: 25vw;
+            margin-bottom: 5vw;
         }
 
         h1 {
@@ -43,37 +44,69 @@
         <input class="btn" type="button" value="Create" onclick="window.location.href = '/poll/new'">
     </p>
     <br>
-    <p>
+    <div data-kind='poll-input'>
         <h5>Respond to a Poll:</h5>
         <label hidden for="id">Poll ID</label>
         <input type="text" name="id" id="poll-id" placeholder="Poll ID">
-        <input class="btn" type="button" name="go" id="poll-go" value="Answer">
-    </p>
+        <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
+        <input class="btn" type="button" disabled name="go" id="poll-go" value="Answer">
+    </div>
     <br>
-    <p>
+    <div data-kind='poll-input'>
         <h5> View Poll Results:</h5>
         <label hidden for="id">Poll ID</label>
         <input type="text" name="id" id="poll-results-id" placeholder="Poll ID">
-        <input class="btn" type="button" name="go" id="poll-results-go" value="View">
-    </p>
+        <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
+        <input class="btn" type="button" disabled name="go" id="poll-results-go" value="View">
+    </div>
     <br>
-    <p>
+    <div data-kind='poll-input'>
         <h5> Lock/Unlock Poll:</h5>
         <label hidden for="id">Poll ID</label>
         <input type="text" name="id" id="poll-lock-id" placeholder="Poll ID">
+        <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
         <input type="text" name="key" id="poll-lock-key" placeholder="Poll Master Key">
-        <input class="btn" type="button" name="go" id="poll-lock-go" value="Lock">
-        <input class="btn" type="button" name="go" id="poll-unlock-go" value="Unlock">
-    </p>
+        <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
+        <input class="btn" type="button" disabled name="go" id="poll-lock-go" value="Lock">
+        <input class="btn" type="button" disabled name="go" id="poll-unlock-go" value="Unlock">
+    </div>
     <br>
-    <p>
+    <div data-kind='poll-input'>
         <h5> Delete Poll:</h5>
         <label hidden for="id">Poll ID</label>
         <input type="text" name="id" id="poll-delete-id" placeholder="Poll ID">
+        <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
         <input type="text" name="key" id="poll-delete-key" placeholder="Poll Master Key">
-        <input class="btn" type="button" name="go" id="poll-delete-go" value="Delete">
-    </p>
+        <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
+        <input class="btn" type="button" disabled name="go" id="poll-delete-go" value="Delete">
+    </div>
     <script>
+        let containers = document.querySelectorAll('div[data-kind=poll-input]');
+        for (let container of containers) {
+            let inputs = container.querySelectorAll('input[type=text]');
+            let buttons = container.querySelectorAll('input[type=button]');
+            for (let input of inputs) {
+                input.setAttribute('data-error', 'Field cannot be blank')
+                input.onchange = (function () {
+                    if (this.value === '') {
+                        this.classList.add('invalid');
+                        for (let button of buttons) {
+                            button.setAttribute('disabled', 'true');
+                        }
+                    } else {
+                        this.classList.remove('invalid');
+                        for (let button of buttons) {
+                            button.removeAttribute('disabled');
+                        }
+                    }
+                }).bind(input);
+
+                input.oninput = input.onchange.bind(input);
+                input.onfocusout = input.onchange.bind(input);
+            }
+        }
+
+
         let button = document.querySelector('#poll-go');
         button.onclick = function () {
             let input = document.querySelector('#poll-id');

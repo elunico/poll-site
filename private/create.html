@@ -21,6 +21,7 @@
         body {
             margin-left: 25vw;
             margin-right: 25vw;
+            margin-bottom: 5vw;
         }
 
         h1 {
@@ -37,8 +38,9 @@
             font-weight: bold;
         }
 
-        #key-area {
-            font-size: 1.1em;
+        .key-text {
+            font-size: 1.2em;
+            font-weight: 800;
             color: red;
         }
     </style>
@@ -75,6 +77,36 @@
         <p id="poll-id-area"></p>
         <p id="key-button-area"></p>
         <p id="key-area" hidden></p>
+        <div id="help" hidden>
+            <h5>Important Information!</h5>
+            <div>
+                Your poll id is the id that you can distribute to other people so that they can see and answer your
+                poll.
+                A person can also see the results of the poll by using this id.
+            </div>
+            <br>
+            <div>
+                Your poll master key is the string that allows you to lock, unlock, and delete your poll.
+                You should <b>NOT</b> share this with people as it is what allows you to lock, unlock and delete your
+                poll. <b>Both</b> the <u>poll ID</u> and the <u>poll master key</u> are required for unlocking, locking,
+                and deleting
+                <br>
+            </div>
+            <br>
+            <div>
+                Locking a poll means responses are no longer accepted. Unlocking a poll allows responses once again.
+                Polls are unlocked by default on creation.
+            </div>
+            <br>
+            <div>
+                Deleting a poll will delete the poll completely as well as all of
+                the responses and prevent people from viewing or answering the poll or the responses.
+            </div>
+            <br>
+            <div>
+                A master key <b>cannot</b> be regenerated so be CAREFUL with it.
+            </div>
+        </div>
     </form>
     <script>
         let questionInput = document.querySelector('#question');
@@ -164,7 +196,9 @@
                 idArea.innerHTML = `<a href="/poll/${pollID}">Your poll has ID ${pollID}</a>`
                 keyButtonArea.innerHTML =
                     `<input type="button" class="btn" onclick="keyArea.removeAttribute('hidden')" value="Show Master Key">`
-                keyArea.innerHTML = `Your poll's master key is ${json.master_key}`;
+                keyArea.innerHTML =
+                    `Your poll's master key is <span class="key-text">${json.master_key}</span>`;
+                help.removeAttribute('hidden');
             });
 
             function revealKey() {
