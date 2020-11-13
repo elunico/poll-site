@@ -129,8 +129,8 @@ else if choices
 
         
             let sbody = JSON.stringify(body);
-            fetch('/poll/submit', {
-                method: "POST", 
+            fetch('/poll', {
+                method: "PUT", 
                 body: sbody,
                 headers: {
                     'Content-Type': 'application/json',
