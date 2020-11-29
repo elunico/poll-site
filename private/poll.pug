@@ -1,9 +1,9 @@
-html 
+html
 
-head 
+head
 link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css")
 script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js")
-style. 
+style.
 
     a:link {
             color: rgb(81, 153, 164);
@@ -38,7 +38,7 @@ style.
     }
 
     .failed {
-        color: red; 
+        color: red;
         font-weight: bold;
         font-size: 1.1em;
     }
@@ -49,8 +49,8 @@ style.
         color: darkgray;
     }
 
-body 
-p(class='footer') 
+body
+p(class='footer')
     a(href="/") Home
 
 
@@ -64,20 +64,20 @@ if free
         textarea(id="response-area", class="tarea")
         br
         input(type="button", class="btn" id="submit-btn", value="Submit Answers")
-    
-    script. 
+
+    script.
         let area = document.querySelector('#response-area');
         let button = document.querySelector('#submit-btn');
 
         button.onclick = function() {
             let body = {
-                pollID: "#{pollID}", 
+                pollID: "#{pollID}",
                 response: {answer: area.value, choice: null}
             }
-        
+
             let sbody = JSON.stringify(body);
             fetch('/poll', {
-                method: "PUT", 
+                method: "PUT",
                 body: sbody,
                 headers: {
                     'Content-Type': 'application/json',
@@ -91,23 +91,23 @@ if free
                 }
             });
         }
-    p View results 
-        a(href="/poll/results/" + pollID) by clicking here 
+    p View results
+        a(href="/poll/results/" + pollID) by clicking here
 
-else if choices 
+else if choices
 
     span(id="whole")
         div(id="answers")
-            each choice in choices 
+            each choice in choices
                 div
-                    label(for=choice) 
-                        input(type="radio", class="with-gap", id=choice, value=choice, name="response") 
-                        span= choice 
+                    label(for=choice)
+                        input(type="radio", class="with-gap", id=choice, value=choice, name="response")
+                        span= choice
         br
         p
             input(type="button", class="btn" id="submit-btn", value="Submit Answers")
 
-    script. 
+    script.
         let button = document.querySelector('#submit-btn');
         let answers = document.querySelector('#answers');
 
@@ -117,20 +117,20 @@ else if choices
             }
             let idx = 0;
             for (let elt of answers.children) { // divs
-                for (let other of elt.children) { // label 
-                for (let last of other.children) {  // inputs 
+                for (let other of elt.children) { // label
+                for (let last of other.children) {  // inputs
                         if (last.checked) {
-                            body.response = { answer: last.value , choice: idx } 
+                            body.response = { answer: last.value , choice: idx }
                         }
                     }
                 }
                 idx++
             }
 
-        
+
             let sbody = JSON.stringify(body);
             fetch('/poll', {
-                method: "PUT", 
+                method: "PUT",
                 body: sbody,
                 headers: {
                     'Content-Type': 'application/json',
@@ -144,9 +144,9 @@ else if choices
                 }
             });
         }
-    p View results 
-        a(href="/poll/results/" + pollID) by clicking here 
+    p View results
+        a(href="/poll/results/" + pollID) by clicking here
 
-else 
+else
     p(class='failed') Sorry! That poll does not exist 😢
 

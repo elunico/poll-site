@@ -2,238 +2,238 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poll Site</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poll Site</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
-    <style>
-        a:link {
-            color: rgb(81, 153, 164);
-        }
+  <style>
+    a:link {
+      color: rgb(81, 153, 164);
+    }
 
-        a:visited {
-            color: rgb(81, 153, 164);
-        }
+    a:visited {
+      color: rgb(81, 153, 164);
+    }
 
-        body {
-            margin-left: 25vw;
-            margin-right: 25vw;
-            margin-bottom: 5vw;
-        }
+    body {
+      margin-left: 25vw;
+      margin-right: 25vw;
+      margin-bottom: 5vw;
+    }
 
-        h1 {
-            font-size: 3rem;
-        }
+    h1 {
+      font-size: 3rem;
+    }
 
-        h1,
-        h5 {
-            font-weight: bold;
-        }
-    </style>
+    h1,
+    h5 {
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
 
-    <!-- Modal Trigger -->
-    <!-- <a class="waves-effect waves-light btn modal-trigger" href="#status-modal">Modal</a> -->
+  <!-- Modal Trigger -->
+  <!-- <a class="waves-effect waves-light btn modal-trigger" href="#status-modal">Modal</a> -->
 
-    <!-- Modal Structure -->
-    <div id="status-modal" class="modal">
-        <div class="modal-content">
-            <h4 id="modal-title">Success</h4>
-            <p id="modal-msg">A bunch of text</p>
-        </div>
-        <div class="modal-footer">
-            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Ok</a>
-        </div>
+  <!-- Modal Structure -->
+  <div id="status-modal" class="modal">
+    <div class="modal-content">
+      <h4 id="modal-title">Success</h4>
+      <p id="modal-msg">A bunch of text</p>
     </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Ok</a>
+    </div>
+  </div>
 
-    <h1>Create and Answer Polls <i>Fast!</i></h1>
-    <p>
+  <h1>Create and Answer Polls <i>Fast!</i></h1>
+  <p>
 
-        <h5>Create a poll:</h5>
+    <h5>Create a poll:</h5>
 
-        <input class="btn" type="button" value="Create" onclick="window.location.href = '/poll/new'">
-    </p>
-    <br>
-    <div data-kind='poll-input'>
-        <h5>Respond to a Poll:</h5>
-        <label hidden for="id">Poll ID</label>
-        <input type="text" name="id" id="poll-id" placeholder="Poll ID">
-        <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
-        <input class="btn" type="button" disabled name="go" id="poll-go" value="Answer">
-    </div>
-    <br>
-    <div data-kind='poll-input'>
-        <h5> View Poll Results:</h5>
-        <label hidden for="id">Poll ID</label>
-        <input type="text" name="id" id="poll-results-id" placeholder="Poll ID">
-        <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
-        <input class="btn" type="button" disabled name="go" id="poll-results-go" value="View">
-    </div>
-    <br>
-    <div data-kind='poll-input'>
-        <h5> Lock/Unlock Poll:</h5>
-        <label hidden for="id">Poll ID</label>
-        <input type="text" name="id" id="poll-lock-id" placeholder="Poll ID">
-        <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
-        <input type="text" name="key" id="poll-lock-key" placeholder="Poll Master Key">
-        <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
-        <input class="btn" type="button" disabled name="go" id="poll-lock-go" value="Lock">
-        <input class="btn" type="button" disabled name="go" id="poll-unlock-go" value="Unlock">
-    </div>
-    <br>
-    <div data-kind='poll-input'>
-        <h5> Delete Poll:</h5>
-        <label hidden for="id">Poll ID</label>
-        <input type="text" name="id" id="poll-delete-id" placeholder="Poll ID">
-        <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
-        <input type="text" name="key" id="poll-delete-key" placeholder="Poll Master Key">
-        <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
-        <input class="btn" type="button" disabled name="go" id="poll-delete-go" value="Delete">
-    </div>
-    <script>
-        let containers = document.querySelectorAll('div[data-kind=poll-input]');
-        for (let container of containers) {
-            let inputs = container.querySelectorAll('input[type=text]');
-            let buttons = container.querySelectorAll('input[type=button]');
-            for (let input of inputs) {
-                input.setAttribute('data-error', 'Field cannot be blank')
-                input.onchange = (function () {
-                    if (this.value === '') {
-                        this.classList.add('invalid');
-                        for (let button of buttons) {
-                            button.setAttribute('disabled', 'true');
-                        }
-                    } else {
-                        this.classList.remove('invalid');
-                        for (let button of buttons) {
-                            button.removeAttribute('disabled');
-                        }
-                    }
-                }).bind(input);
-
-                input.oninput = input.onchange.bind(input);
-                input.onfocusout = input.onchange.bind(input);
+    <input class="btn" type="button" value="Create" onclick="window.location.href = '/poll/new'">
+  </p>
+  <br>
+  <div data-kind='poll-input'>
+    <h5>Respond to a Poll:</h5>
+    <label hidden for="id">Poll ID</label>
+    <input type="text" name="id" id="poll-id" placeholder="Poll ID">
+    <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
+    <input class="btn" type="button" disabled name="go" id="poll-go" value="Answer">
+  </div>
+  <br>
+  <div data-kind='poll-input'>
+    <h5> View Poll Results:</h5>
+    <label hidden for="id">Poll ID</label>
+    <input type="text" name="id" id="poll-results-id" placeholder="Poll ID">
+    <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
+    <input class="btn" type="button" disabled name="go" id="poll-results-go" value="View">
+  </div>
+  <br>
+  <div data-kind='poll-input'>
+    <h5> Lock/Unlock Poll:</h5>
+    <label hidden for="id">Poll ID</label>
+    <input type="text" name="id" id="poll-lock-id" placeholder="Poll ID">
+    <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
+    <input type="text" name="key" id="poll-lock-key" placeholder="Poll Master Key">
+    <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
+    <input class="btn" type="button" disabled name="go" id="poll-lock-go" value="Lock">
+    <input class="btn" type="button" disabled name="go" id="poll-unlock-go" value="Unlock">
+  </div>
+  <br>
+  <div data-kind='poll-input'>
+    <h5> Delete Poll:</h5>
+    <label hidden for="id">Poll ID</label>
+    <input type="text" name="id" id="poll-delete-id" placeholder="Poll ID">
+    <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
+    <input type="text" name="key" id="poll-delete-key" placeholder="Poll Master Key">
+    <span class="helper-text" data-error="Field cannot be blank" data-success=""><br></span>
+    <input class="btn" type="button" disabled name="go" id="poll-delete-go" value="Delete">
+  </div>
+  <script>
+    let containers = document.querySelectorAll('div[data-kind=poll-input]');
+    for (let container of containers) {
+      let inputs = container.querySelectorAll('input[type=text]');
+      let buttons = container.querySelectorAll('input[type=button]');
+      for (let input of inputs) {
+        input.setAttribute('data-error', 'Field cannot be blank')
+        input.onchange = (function () {
+          if (this.value === '') {
+            this.classList.add('invalid');
+            for (let button of buttons) {
+              button.setAttribute('disabled', 'true');
             }
+          } else {
+            this.classList.remove('invalid');
+            for (let button of buttons) {
+              button.removeAttribute('disabled');
+            }
+          }
+        }).bind(input);
+
+        input.oninput = input.onchange.bind(input);
+        input.onfocusout = input.onchange.bind(input);
+      }
+    }
+
+    function showModal(title, message) {
+      let elt = document.querySelector('#status-modal');
+      let msg = document.querySelector('#modal-msg');
+      let mt = document.querySelector('#modal-title');
+      msg.textContent = message;
+      mt.textContent = title
+      M.Modal.init(elt, {}).open();
+    }
+
+
+    let button = document.querySelector('#poll-go');
+    button.onclick = function () {
+      let input = document.querySelector('#poll-id');
+      let id = input.value;
+      window.location.href = `/poll/${id}`;
+    }
+
+    let viewButton = document.querySelector('#poll-results-go');
+    viewButton.onclick = function () {
+      let input = document.querySelector('#poll-results-id');
+      let id = input.value;
+      window.location.href = `/poll/results/${id}`;
+    }
+
+    let lockButton = document.querySelector('#poll-lock-go');
+    lockButton.onclick = function () {
+      let id = document.querySelector('#poll-lock-id').value;
+      let key = document.querySelector('#poll-lock-key').value;
+
+      let body = {
+        id: id,
+        master_key: key
+      };
+      let sbody = JSON.stringify(body);
+
+      fetch(`/poll/lock/${id}`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': sbody.length
+        },
+        body: sbody
+      }).then(resp => resp.json()).then(data => {
+        if (data.success) {
+          showModal('Successfully locked poll', data.reason);
+        } else {
+          showModal('Failed to lock poll', data.reason);
         }
+      }).catch(reason => {
+        showModal('Failed to lock poll', data.reason);
+      });
+    }
 
-        function showModal(title, message) {
-            let elt = document.querySelector('#status-modal');
-            let msg = document.querySelector('#modal-msg');
-            let mt = document.querySelector('#modal-title');
-            msg.textContent = message;
-            mt.textContent = title
-            M.Modal.init(elt, {}).open();
+    let unlockButton = document.querySelector('#poll-unlock-go');
+    unlockButton.onclick = function () {
+      let id = document.querySelector('#poll-lock-id').value;
+      let key = document.querySelector('#poll-lock-key').value;
+
+      let body = {
+        id: id,
+        master_key: key
+      };
+      let sbody = JSON.stringify(body);
+
+      fetch(`/poll/unlock/${id}`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': sbody.length
+        },
+        body: sbody
+      }).then(resp => resp.json()).then(data => {
+        if (data.success) {
+          showModal('Successfully unlocked poll', data.reason);
+        } else {
+          showModal('Failed to unlock poll', data.reason);
         }
+      }).catch(reason => {
+        showModal('Failed to unlock poll', data.reason);
+      });
+    }
 
+    let deleteButton = document.querySelector('#poll-delete-go');
+    deleteButton.onclick = function () {
+      let id = document.querySelector('#poll-delete-id').value;
+      let key = document.querySelector('#poll-delete-key').value;
 
-        let button = document.querySelector('#poll-go');
-        button.onclick = function () {
-            let input = document.querySelector('#poll-id');
-            let id = input.value;
-            window.location.href = `/poll/${id}`;
+      let body = {
+        id: id,
+        master_key: key
+      };
+      let sbody = JSON.stringify(body);
+
+      fetch(`/poll/${id}`, {
+        method: "DELETE",
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': sbody.length
+        },
+        body: sbody
+      }).then(resp => {
+        return resp.json()
+      }).then(data => {
+        if (data.success) {
+          showModal('Successfully Deleted', data.reason);
+        } else {
+          showModal('Failed to delete', data.reason);
         }
-
-        let viewButton = document.querySelector('#poll-results-go');
-        viewButton.onclick = function () {
-            let input = document.querySelector('#poll-results-id');
-            let id = input.value;
-            window.location.href = `/poll/results/${id}`;
-        }
-
-        let lockButton = document.querySelector('#poll-lock-go');
-        lockButton.onclick = function () {
-            let id = document.querySelector('#poll-lock-id').value;
-            let key = document.querySelector('#poll-lock-key').value;
-
-            let body = {
-                id: id,
-                master_key: key
-            };
-            let sbody = JSON.stringify(body);
-
-            fetch(`/poll/lock/${id}`, {
-                method: "PUT",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': sbody.length
-                },
-                body: sbody
-            }).then(resp => resp.json()).then(data => {
-                if (data.success) {
-                    showModal('Successfully locked poll', data.reason);
-                } else {
-                    showModal('Failed to lock poll', data.reason);
-                }
-            }).catch(reason => {
-                showModal('Failed to lock poll', data.reason);
-            });
-        }
-
-        let unlockButton = document.querySelector('#poll-unlock-go');
-        unlockButton.onclick = function () {
-            let id = document.querySelector('#poll-lock-id').value;
-            let key = document.querySelector('#poll-lock-key').value;
-
-            let body = {
-                id: id,
-                master_key: key
-            };
-            let sbody = JSON.stringify(body);
-
-            fetch(`/poll/unlock/${id}`, {
-                method: "PUT",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': sbody.length
-                },
-                body: sbody
-            }).then(resp => resp.json()).then(data => {
-                if (data.success) {
-                    showModal('Successfully unlocked poll', data.reason);
-                } else {
-                    showModal('Failed to unlock poll', data.reason);
-                }
-            }).catch(reason => {
-                showModal('Failed to unlock poll', data.reason);
-            });
-        }
-
-        let deleteButton = document.querySelector('#poll-delete-go');
-        deleteButton.onclick = function () {
-            let id = document.querySelector('#poll-delete-id').value;
-            let key = document.querySelector('#poll-delete-key').value;
-
-            let body = {
-                id: id,
-                master_key: key
-            };
-            let sbody = JSON.stringify(body);
-
-            fetch(`/poll/${id}`, {
-                method: "DELETE",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': sbody.length
-                },
-                body: sbody
-            }).then(resp => {
-                return resp.json()
-            }).then(data => {
-                if (data.success) {
-                    showModal('Successfully Deleted', data.reason);
-                } else {
-                    showModal('Failed to delete', data.reason);
-                }
-            }).catch(reason => {
-                showModal('Failed to delete', reason);
-            })
-        }
-    </script>
+      }).catch(reason => {
+        showModal('Failed to delete', reason);
+      })
+    }
+  </script>
 </body>
 
 </html>
