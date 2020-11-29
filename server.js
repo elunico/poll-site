@@ -13,6 +13,8 @@ const store = new db({
 });
 
 const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
 app.use(express.json());
 
 const environment = process.env.NODE_ENVIRONMENT;
@@ -22,7 +24,7 @@ let submitMiddleware;
 if (environment == 'production') {
     submitMiddleware = () => rateLimit({
         max: process.env.RATE_LIMIT_SUBMISSIONS || 1,
-        windowMs: process.env.RATE_LIMIT_WINDOW_MILLIS || (1000 * 60 * 1), // 1 minute 
+        windowMs: process.env.RATE_LIMIT_WINDOW_MILLIS || (1000 * 60 * 1), // 1 minute
         message: {
             success: false,
             reason: 'Too many submission attempts!'
@@ -117,7 +119,7 @@ app.get('/poll/:id', (req, res) => {
                 err: err
             })
         } else if (doc === null) {
-            // render missing poll 
+            // render missing poll
             res.send(pollRenderer({
                 free: false,
                 choices: null
@@ -291,6 +293,47 @@ app.get('/poll/results/:id', (req, res) => {
             res.send(resultRenderer(doc));
         }
     })
+});
+
+io.on('connection', (socket) => {
+    let interval;
+    socket.on('whoami', (msg) => {
+        socket.userData = {
+            pollID: msg
+        };
+        socket.join(msg);
+
+        interval = setInterval(() => {
+            let pollID = socket.userData.pollID;
+
+            store.findOne({
+                pollID
+            }, (err, doc) => {
+                if (err) {
+                    io.emit('receive', {
+                        success: false,
+                        err: err
+                    })
+                } else if (doc === null) {
+                    io.emit('receive', {
+                        free: false,
+                        choices: null
+                    })
+                } else {
+                    io.emit('receive', doc)
+                }
+            })
+
+        }, 500);
+    });
+
+    socket.on('done', (msg) => clearInterval(interval));
+
+    socket.on('disconnect', (msg) => {
+        clearInterval(interval);
+        console.log("Socket disconnecting!");
+    });
+
 })
 
-app.listen(8000);
+server.listen(8000);

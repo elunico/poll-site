@@ -1,16 +1,56 @@
-html 
+html
 
-head 
+head
 
 link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css")
 script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js")
+script(src="/socket.io/socket.io.js")
+script(src="https://code.jquery.com/jquery-3.4.1.min.js")
+script.
+    var socket = io();
+    socket.emit('whoami', '#{pollID}');
 
-style. 
+    socket.on('receive', (msg) => {
+        if (msg && msg.responses && msg.responses.length) {
+            let placeholder = document.getElementsByClassName('placeholder-text')[0];
+            if (placeholder)placeholder.setAttribute('hidden', 'hidden');
+            if (msg.free) {
+                let answers = document.getElementById('answer-spaces');
+                answers.innerHTML = '';
+                for (let answer of msg.responses) {
+                    let p = document.createElement('p');
+                    p.textContent = answer.answer;
+                    answers.appendChild(p);
+                }
+            } else {
+                var rs = {};
+                var map = {};
+                if (msg.responses) {
+                    for (choice of msg.responses) {
+                        rs[choice.choice] = 1 + (rs[choice.choice] || 0)
+                        map[choice.choice] = choice
+                    }
+
+
+                    for (let idx of Object.keys(rs)) {
+                        let answer = document.getElementById('td-' + idx);
+                        let count = document.getElementById('td-answer-' + idx);
+                        answer.innerHTML = `<b>${map[idx].answer}</b>`;
+                        count.innerHTML = `${rs[idx]}`;
+                    }
+                }
+            }
+        } else {
+            console.log('No Responses have been submitted.')
+        }
+    });
+
+style.
 
     .placeholder-text {
         font-size: 1.1em;
         color: grey;
-        font-style: italic; 
+        font-style: italic;
         margin-left: 1%;
     }
 
@@ -21,10 +61,10 @@ style.
     a:visited {
         color: rgb(81, 153, 164);
     }
-    
+
     .results-table {
         border: 1px solid black;
-        justify-content: right; 
+        justify-content: right;
     }
 
     td {
@@ -63,46 +103,60 @@ style.
         color: darkgray;
     }
 
-body 
-p(class='footer') 
+body
+p(class='footer')
     a(href="/") Home
 
 
-h3 Poll 
+h3 Poll
     a(href="/poll/" + pollID) #{pollID}
 
 h1(class="question") #{question}
 
 if free
-    h2 Responses: 
-    each response in responses
-        p= response.answer  
-else 
+    h2 Responses:
+    div(id="answer-spaces")
+        each response in responses
+            p= response.answer
+else
 
     div(id="answers")
         - var rs = {};
         - var map = {};
-        if responses
+        if responses && responses.length
             each choice in responses
                 - rs[choice.choice] = 1 + (rs[choice.choice] || 0)
-                - map[choice.choice] = choice 
-            
+                - map[choice.choice] = choice
+
 
             table(class="results-table")
-                thead 
-                    tr 
-                        td 
-                            b Answer Choice 
-                        td Number of Votes
-                tbody 
-                    - for (let idx of Object.keys(rs)) 
-                        tr
+                thead
+                    tr
                         td
-                            //- b= `${Number(idx) + 1}. ${map[idx].answer}` 
-                            b= `${map[idx].answer}` 
-                        td(class='number')
+                            b Answer Choice
+                        td Number of Votes
+                tbody
+                    - for (let idx of Object.keys(rs))
+                        tr
+                        td(id="td-" + idx)
+                            //- b= `${Number(idx) + 1}. ${map[idx].answer}`
+                            b= `${map[idx].answer}`
+                        td(id="td-answer-" + idx, class='number')
                             = rs[idx]
-        else 
+        else
             p(class='placeholder-text') No Responses have been submitted.
-    
-    
+            table(class="results-table")
+                thead
+                    tr
+                        td
+                            b Answer Choice
+                        td Number of Votes
+                tbody
+                    - for (let idx = 0; idx < choices.length; idx++)
+                        tr
+                        td(id="td-" + idx)
+                            //- b= `${Number(idx) + 1}. ${map[idx].answer}`
+                            b= `${choices[idx]}`
+                        td(id="td-answer-" + idx, class='number')
+                            = 0
+
