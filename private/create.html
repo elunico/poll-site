@@ -43,12 +43,25 @@
       font-weight: 800;
       color: red;
     }
+
+    .warning {
+      font-weight: 800;
+      color: red;
+    }
+
+    .warning-text {
+      font-size: 110%;
+      color: darkred;
+    }
   </style>
 </head>
 
 <body>
   <h1>Create a Poll</h1>
-
+  <h3 class="warning">Warning!</h3>
+  <p class="warning-text">All polls are deleted 1 month after they are created. This is for the sake of space and
+    efficiency. If you want
+    your poll results to be persistant, you must record them offsite yourself.</p>
   <form name="poll-form" id="poll-form">
     <label for="question">Question: </label>
     <input type="text" name="question" id="question" placeholder="question">

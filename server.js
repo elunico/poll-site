@@ -12,6 +12,37 @@ const store = new db({
   autoload: true
 });
 
+function oneMonthAgoMillis() {
+  let date = new Date();
+  if (date.getMonth() == 0) { // January
+    date.setFullYear(date.getFullYear() - 1);
+  }
+  date.setMonth((12 + date.getMonth() - 1) % 12);
+  return date.getTime();
+}
+
+store.persistence.setAutocompactionInterval(1000 * 60 * 10); // 10 minutes
+
+function clearExpiredPolls() {
+  store.remove({
+    created: {
+      $lt: oneMonthAgoMillis()
+    }
+  }, {
+    multi: true
+  }, function (err, count) {
+    if (err) {
+      console.error(err);
+      console.error("Could not remove old polls!! ");
+    } else {
+      console.log(`Pruned ${count} expired polls`);
+    }
+  });
+}
+
+setInterval(clearExpiredPolls, 1000 * 60 * 60 * 6); // 6 hours
+clearExpiredPolls();
+
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
@@ -310,17 +341,17 @@ io.on('connection', (socket) => {
         pollID
       }, (err, doc) => {
         if (err) {
-          io.emit('receive', {
+          io.to(pollID).emit('receive', {
             success: false,
             err: err
           })
         } else if (doc === null) {
-          io.emit('receive', {
+          io.to(pollID).emit('receive', {
             free: false,
             choices: null
           })
         } else {
-          io.emit('receive', doc)
+          io.to(pollID).emit('receive', doc)
         }
       })
 
@@ -334,6 +365,20 @@ io.on('connection', (socket) => {
     console.log("Socket disconnecting!");
   });
 
+});
+
+app.get('/count', (req, res) => {
+  store.find({}, function (err, docs) {
+    if (err) {
+      res.status(500);
+      res.send('500: Internal Server Error');
+    } else {
+      res.status(200);
+      res.json({
+        pollCount: docs.length
+      })
+    }
+  })
 })
 
 server.listen(8000);
