@@ -381,4 +381,18 @@ app.get('/count', (req, res) => {
   })
 })
 
-server.listen(8000);
+function drop_root() {
+  process.setgid('nobody');
+  process.setuid('nobody');
+}
+
+if (process.env.NODE_ENVIRONMENT == 'development') {
+  server.listen(8000);
+} else {
+  server.listen(80, () => {
+    console.log("Listening...");
+    console.log("Attempting to drop gid");
+    drop_root();
+    console.log(`Group is now ${process.getgid()}`)
+  })
+}
