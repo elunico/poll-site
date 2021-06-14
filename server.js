@@ -2,7 +2,7 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const pug = require('pug');
-const crypto = require('crypto')
+const crypto = require('crypto');
 
 require('dotenv').config();
 
@@ -44,6 +44,8 @@ setInterval(clearExpiredPolls, 1000 * 60 * 60 * 6); // 6 hours
 clearExpiredPolls();
 
 const app = express();
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'private'));
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 app.use(express.json());
@@ -66,7 +68,7 @@ if (environment == 'production') {
     return (req, res, next) => {
       next();
     };
-  }
+  };
   app.get('/poll', (req, res) => {
     db.find({}, (err, docs) => {
       if (err) {
@@ -74,7 +76,7 @@ if (environment == 'production') {
       } else {
         res.json(docs);
       }
-    })
+    });
   });
 }
 
@@ -84,7 +86,7 @@ app.get('/', (req, res) => {
 
 app.get('/poll/new', (req, res) => {
   res.sendFile(path.join(__dirname, 'private', 'create.html'));
-})
+});
 
 function randomLetters(count) {
   return crypto.randomBytes(2 << (count + 1))
@@ -119,12 +121,12 @@ app.post('/poll', (req, res) => {
       res.status(500).json({
         success: false,
         err: err
-      })
+      });
     } else if (doc === null) {
       res.status(404).json({
         success: false,
         reason: `Could not find the poll ${id}`
-      })
+      });
     } else {
       res.json({
         pollID: id,
@@ -136,9 +138,6 @@ app.post('/poll', (req, res) => {
   });
 });
 
-const pollRenderer = pug.compileFile(path.join(__dirname, 'private', 'poll.pug'))
-const resultRenderer = pug.compileFile(path.join(__dirname, 'private', 'results.pug'))
-
 app.get('/poll/:id', (req, res) => {
   let id = req.params.id;
   store.findOne({
@@ -148,20 +147,20 @@ app.get('/poll/:id', (req, res) => {
       res.status(500).json({
         success: false,
         err: err
-      })
+      });
     } else if (doc === null) {
       // render missing poll
-      res.send(pollRenderer({
+      res.render('poll.pug', {
         free: false,
         choices: null
-      }))
+      });
     } else if (doc.locked) {
       res.sendFile(path.join(__dirname, 'private', 'locked.html'));
     } else {
-      res.send(pollRenderer({
+      res.render('poll.pug', {
         pollID: id,
         ...doc
-      }));
+      });
     }
   });
 });
@@ -170,7 +169,7 @@ app.put('/poll', submitMiddleware(), (req, res) => {
   let pollID = req.body.pollID;
   let response = {
     ...req.body.response
-  }
+  };
 
   store.update({
     pollID: pollID
@@ -185,7 +184,7 @@ app.put('/poll', submitMiddleware(), (req, res) => {
       res.status(500).json({
         success: false,
         error: err || 'Number was greater than 1'
-      })
+      });
     } else {
       res.json({
         success: true,
@@ -193,7 +192,7 @@ app.put('/poll', submitMiddleware(), (req, res) => {
         pollID: pollID
       });
     }
-  })
+  });
 
 });
 
@@ -207,12 +206,12 @@ function changeLock(locked, req, res) {
       res.status(500).json({
         success: false,
         err: err
-      })
+      });
     } else if (doc === null) {
       res.status(404).json({
         success: false,
         reason: `Poll was not found in the database`
-      })
+      });
     } else {
       if (doc.master_key == key) {
         store.update({
@@ -233,14 +232,14 @@ function changeLock(locked, req, res) {
             res.status(404).json({
               success: false,
               reason: `Poll was not found in the database`
-            })
+            });
           } else {
             res.json({
               success: true,
               message: 'Successfully ' + (locked ? 'locked' : 'unlocked') + ' the poll!'
-            })
+            });
           }
-        })
+        });
       } else {
         res.status(403).json({
           success: false,
@@ -248,7 +247,7 @@ function changeLock(locked, req, res) {
         });
       }
     }
-  })
+  });
 }
 
 app.put('/poll/unlock/:id', (req, res) => {
@@ -268,12 +267,12 @@ app.delete('/poll/:id', (req, res) => {
       res.status(500).json({
         success: false,
         err: err
-      })
+      });
     } else if (doc === null) {
       res.status(404).json({
         success: false,
         reason: `Poll was not found in the database`
-      })
+      });
     } else {
       if (doc.master_key == param) {
         store.remove({
@@ -288,14 +287,14 @@ app.delete('/poll/:id', (req, res) => {
             res.status(404).json({
               success: false,
               reason: `Poll was not found in the database`
-            })
+            });
           } else {
             res.json({
               success: true,
               message: 'Successfully deleted poll'
-            })
+            });
           }
-        })
+        });
       } else {
         res.status(403).json({
           success: false,
@@ -303,7 +302,7 @@ app.delete('/poll/:id', (req, res) => {
         });
       }
     }
-  })
+  });
 });
 
 app.get('/poll/results/:id', (req, res) => {
@@ -314,16 +313,16 @@ app.get('/poll/results/:id', (req, res) => {
       res.status(500).json({
         success: false,
         err: err
-      })
+      });
     } else if (doc === null) {
-      res.send(pollRenderer({
+      res.render('results.pug', {
         free: false,
         choices: null
-      }))
+      });
     } else {
-      res.send(resultRenderer(doc));
+      res.render('results.pug', doc);
     }
-  })
+  });
 });
 
 io.on('connection', (socket) => {
@@ -344,16 +343,16 @@ io.on('connection', (socket) => {
           io.to(pollID).emit('receive', {
             success: false,
             err: err
-          })
+          });
         } else if (doc === null) {
           io.to(pollID).emit('receive', {
             free: false,
             choices: null
-          })
+          });
         } else {
-          io.to(pollID).emit('receive', doc)
+          io.to(pollID).emit('receive', doc);
         }
-      })
+      });
 
     }, 500);
   });
@@ -376,23 +375,75 @@ app.get('/count', (req, res) => {
       res.status(200);
       res.json({
         pollCount: docs.length
-      })
+      });
     }
-  })
-})
+  });
+});
 
-function drop_root() {
-  process.setgid('nobody');
-  process.setuid('nobody');
-}
+app.get('/api/poll/result/:id', (req, res) => {
+  store.findOne({
+    pollID: req.params.id
+  }, (err, doc) => {
+    if (err) {
+      res.status(500).json({
+        success: false,
+        err: err
+      });
+    } else if (doc === null) {
+      res.json({
+        free: false,
+        choices: null
+      });
+    } else {
+      let result = {
+        poll: doc,
+        response: Date.now()
+      };
+      delete result.poll.master_key;
+      res.json(result);
+    }
+  });
+});
+
+
+// function drop_root() {
+//   process.setgid('nobody');
+//   process.setuid('nobody');
+// }
 
 if (process.env.NODE_ENVIRONMENT == 'development') {
+  app.get('/api/poll/results', (req, res) => {
+    store.find({}, (err, docs) => {
+      if (err) {
+        res.status(500).json({
+          success: false,
+          err: err
+        });
+      } else if (docs === null || docs === []) {
+        res.json({
+          free: false,
+          choices: null
+        });
+      } else {
+        for (let doc of docs) {
+          delete doc.master_key;
+        }
+        let result = {
+          count: docs.length,
+          polls: docs,
+          response: Date.now()
+        };
+        res.json(result);
+      }
+    });
+  });
+
   server.listen(8000);
 } else {
   server.listen(80, () => {
     console.log("Listening...");
     console.log("Attempting to drop gid");
-    drop_root();
-    console.log(`Group is now ${process.getgid()}`)
-  })
+    // drop_root();
+    console.log(`Group is now ${process.getgid()}`);
+  });
 }

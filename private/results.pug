@@ -143,6 +143,19 @@ else
                             b= `${map[idx].answer}`
                         td(id="td-answer-" + idx, class='number')
                             = rs[idx]
+            script.
+                let rs = !{JSON.stringify(rs)}
+                let idx = 1;
+                let elt;
+                let maxVotes = 0;
+                for (let i of Object.keys(rs)) {
+                    maxVotes = rs[i] > maxVotes ? rs[i]: maxVotes;
+                }
+                while ((elt = document.querySelector('#td-answer-' + idx++)) !== null) {
+                    console.log(elt);
+                    let percent = ((rs[idx] / maxVotes) * 100).toFixed(0)  || 1;
+                    elt.style.background = `linear-gradient(to right, #03DAC6 ${percent}%, white ${percent}%)`;
+                }
         else
             p(class='placeholder-text') No Responses have been submitted.
             table(class="results-table")
